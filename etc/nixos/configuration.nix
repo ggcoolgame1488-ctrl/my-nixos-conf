@@ -16,6 +16,7 @@
       ./tg-ws-proxy.nix
       ./all_nixpkg.nix
       ./noctalia-processes.nix
+      ./zapret.nix
     ];
 
 
@@ -149,6 +150,10 @@ boot.loader = {
     '';
   };
 
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true; # Важно для Proton и 32-битных игр!
+  };
 
   # Конфигурация подсветки COLORFUL P15
   hardware.colorfulP15Backlight = {
