@@ -1,0 +1,94 @@
+Конечно! Вот полная пошаговая инструкция с нуля: от клонирования репозитория и первоначальной настройки до повседневного управления и смены стратегий на NixOS.
+
+---
+
+### 🛠 Полная инструкция по установке и управлению `zapret` на NixOS
+
+#### Шаг 1. Клонирование репозиториев
+
+Если ты ставишь всё с чистого листа, клонируем официальный репозиторий `zapret` (или используем файлы инсталлятора) и репозиторий с набором готовых конфигураций:
+
+```bash
+# Клонируем основной репозиторий zapret (в /opt/zapret)
+sudo git clone https://github.com/bol-van/zapret /opt/zapret
+
+# Клонируем репозиторий с готовыми конфигурациями и инсталлятором
+sudo git clone https://github.com/Snowy-Fluffy/zapret.cfgs /opt/zapret/zapret.cfgs
+sudo git clone https://github.com/Snowy-Fluffy/zapret.cfgs /opt/zapret.installer
+
+```
+
+#### Шаг 2. Подготовка директорий и начального конфига
+
+Интерактивные скрипты инсталлятора на NixOS часто падают из-за проверки зависимостей и жесткого режима оболочки (`set -e`). Поэтому мы настраиваем всё вручную:
+
+1. Создаем необходимые рабочие директории:
+```bash
+sudo mkdir -p /opt/zapret.installer/files /opt/zapret
+
+```
+
+
+2. Выбираем любую базовую стратегию (например, `general_ALT11`) и копируем её в качестве рабочего конфига:
+```bash
+sudo cp /opt/zapret/zapret.cfgs/configurations/general_ALT11 /opt/zapret/config
+sudo cp /opt/zapret/zapret.cfgs/configurations/general_ALT11 /opt/zapret.installer/files/config
+
+```
+
+
+3. Указываем корректный тип файрвола (`iptables` или `nftables` в зависимости от того, что крутится в системе):
+```bash
+sudo sed -i 's/^FWTYPE=.*/FWTYPE=iptables/' /opt/zapret/config
+sudo sed -i 's/^FWTYPE=.*/FWTYPE=iptables/' /opt/zapret.installer/files/config
+
+```
+
+
+
+#### Шаг 3. Первый запуск и проверка
+
+Запускаем службу обхода через штатный инициализирующий скрипт:
+
+```bash
+sudo /opt/zapret/init.d/sysv/zapret start
+
+```
+
+Убеждаемся, что демон `nfqws` успешно подхватил конфигурацию и закрутился в системе:
+
+```bash
+pgrep -a nfqws
+
+```
+
+---
+
+### 🔄 Повседневное управление и смена стратегий
+
+Если в будущем захочется протестировать другую стратегию (например, `UltimateFix` или другой `general_ALT*`), интерактивное меню запускать **не нужно** — просто сделай три простых шага:
+
+1. **Скопируй нужный пресет:**
+*(Список всех вариантов можно посмотреть через `ls /opt/zapret/zapret.cfgs/configurations/`)*
+```bash
+sudo cp /opt/zapret/zapret.cfgs/configurations/ИМЯ_СТРАТЕГИИ /opt/zapret/config
+sudo cp /opt/zapret/zapret.cfgs/configurations/ИМЯ_СТРАТЕГИИ /opt/zapret.installer/files/config
+
+```
+
+
+2. **Перезапусти сервис:**
+```bash
+sudo /opt/zapret/init.d/sysv/zapret restart
+
+```
+
+
+3. **Базовые команды управления сервисом:**
+* **Остановка:** `sudo /opt/zapret/init.d/sysv/zapret stop`
+* **Запуск:** `sudo /opt/zapret/init.d/sysv/zapret start`
+* **Перезапуск:** `sudo /opt/zapret/init.d/sysv/zapret restart`
+
+
+
+Сохрани эту шпаргалку — с ней у тебя всегда будет полный контроль над обходом блокировок без зависимости от капризных скриптов установки!
